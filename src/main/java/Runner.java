@@ -72,7 +72,7 @@ public class Runner {
                 String text = jsonObject.getString("text");
                 String cmd = jsonObject.getString("command");
 
-                if (cmd.toLowerCase().equalsIgnoreCase("test1")) {
+                if (cmd.toLowerCase().equalsIgnoreCase("app")) {
                     String chatId = jsonObject.getString("chat");
                     String userId = jsonObject.getString("userId");
                     //                    User user = _dbManager.getUserById(userId);
