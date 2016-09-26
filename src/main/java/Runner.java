@@ -49,25 +49,6 @@ public class Runner {
             return "Approval created";
         });
 
-//        get("/viewall",
-//                (req, res) -> new ModelAndView(getLauncherMap(req.queryParams("flockEvent")),
-//                        "template_launcher.mustache"), new MustacheTemplateEngine());
-//
-//        get("/view",
-//                (req, res) -> new ModelAndView(getLauncherMapForBill(req.queryParams("billId")),
-//                        "template_bill.mustache"), new MustacheTemplateEngine());
-
-
-//        post("/approve", (req, res) -> {
-//            _logger.debug("Received approval request with body: " + req.body());
-//            return approveOrRejectBill(req, true);
-//        });
-//
-//        post("/reject", (req, res) -> {
-//            _logger.debug("Received rejection request with body: " + req.body());
-//            return approveOrRejectBill(req, false);
-//        });
-
         post("/", (req, res) -> {
             _logger.debug("Req received : " + req.body());
             JSONObject jsonObject = new JSONObject(req.body());
@@ -76,7 +57,6 @@ public class Runner {
             if ("app.install".equals(type)) {
                 String userId = jsonObject.getString("userId");
                 String userToken = jsonObject.getString("userToken");
-                //                _dbManager.insertOrUpdateUser(new User(userId, userToken));
                 Runner.userId = userId;
                 Runner.userToken = userToken;
                 _logger.debug("User inserted : " + userId + " User Token : " + userToken +
@@ -97,38 +77,7 @@ public class Runner {
                     String userId = jsonObject.getString("userId");
                     //                    User user = _dbManager.getUserById(userId);
 
-                    switch (text) {
-                        case "test":
-                            _messagingService.sendMessageType1(chatId);
-                            break;
-                        case "test1":
-                            _messagingService.sendMessageType2(chatId);
-                            break;
-                        case "flockml":
-                            _messagingService.sendMessageTypeFlockML(chatId);
-                            break;
-                        case "flockmlAtt":
-                            _messagingService.sendMessageTypeFlockMLInAttachment(chatId);
-                            break;
-                        case "text":
-                            _messagingService.sendMsgTextOnly(chatId);
-                            break;
-                        case "attach_title":
-                            _messagingService.sendMsgTextAttachmentTitle(chatId);
-                            break;
-                        case "attach_flockml":
-                            _messagingService.sendMsgAttachementFlockMl(chatId);
-                            break;
-                        case "attach_flockml_mention":
-                            _messagingService.sendMsgAttachmentFlockMlMention(chatId);
-                            break;
-                        case "attach_imgbutton":
-                            _messagingService.sendMsgImageButton(chatId);
-                            break;
-                        case "attach_imgbutton_flockml":
-                            _messagingService.sendMsgImageButtonFlockMl(chatId);
-                            break;
-                    }
+                    _messagingService.sendPlatformMessage(text, chatId);
                 }
             }
             return "";
