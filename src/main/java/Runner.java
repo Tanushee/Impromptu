@@ -122,6 +122,12 @@ public class Runner {
                         case "attach_flockml_mention":
                             _messagingService.sendMsgAttachmentFlockMlMention(chatId);
                             break;
+                        case "attach_imgbutton":
+                            _messagingService.sendMsgImageButton(chatId);
+                            break;
+                        case "attach_imgbutton_flockml":
+                            _messagingService.sendMsgImageButtonFlockMl(chatId);
+                            break;
                     }
                 }
             }

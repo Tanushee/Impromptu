@@ -217,6 +217,29 @@ public class MessagingService {
     }
 
 
+    public void sendMsgImageButton(String chatId)
+    {
+        _logger.debug(
+                " user: " + Runner.userId + " Token: " + Runner.userToken + " chatId: " + chatId);
+        Message message = new Message(chatId, "Test message text -------- is tis long enough? Do you dee image??????? <html> dskhfd</html> ");
+        message.setAttachments(_attachmentMessage.get_msg_imgbutton());
+        String messageJson = new Gson().toJson(message);
+        _logger.debug("messageJson: " + messageJson);
+        sendMessage(Runner.userToken, message);
+    }
+
+    public void sendMsgImageButtonFlockMl(String chatId)
+    {
+        _logger.debug(
+                " user: " + Runner.userId + " Token: " + Runner.userToken + " chatId: " + chatId);
+        Message message = new Message(chatId, "Test message text ");
+        message.setAttachments(_attachmentMessage.get_msg_imgbutton_flockml());
+        String messageJson = new Gson().toJson(message);
+        _logger.debug("messageJson: " + messageJson);
+        sendMessage(Runner.userToken, message);
+    }
+
+
     private static void sendMessage(String token, Message message) {
         _logger.debug("Sending message to  : " + message.getTo() + " text : " + message.getText() +
                 "User token: " + token + "Runner token" + Runner.userToken);
