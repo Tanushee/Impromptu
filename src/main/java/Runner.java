@@ -1,5 +1,10 @@
+import database.DbConfig;
+import database.DbManager;
+import database.User;
+
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
+
 import spark.ModelAndView;
 import spark.template.mustache.MustacheTemplateEngine;
 
@@ -11,43 +16,24 @@ import static spark.Spark.*;
 /**
  * Created by tanushee on 23/9/16.
  **/
-public class Runner {
+public class Runner
+{
 
     private static final Logger _logger = Logger.getLogger(Runner.class);
     private static MessagingService _messagingService;
-    public static String userId = "u:bsy83reyjc87ya6q";
-    public static String userToken = "1c5c380b-0a02-4774-af55-81291dfca107";
+    private static DbManager _dbManager;
 
-    public static void main(String[] args) throws Exception {
-        //secure("deploy/keystore.jks", "password", null, null);
+    public static void main(String[] args) throws Exception
+    {
         _logger.debug("Starting..");
-        //        _dbManager = new DbManager(getDbConfig());
+        _dbManager = new DbManager(getDbConfig());
         _messagingService = new MessagingService();
         port(9000);
         HashMap map = new HashMap();
         staticFileLocation("/public");
         map.put("resourcePrefix", "");
         get("/new", (req, res) -> new ModelAndView(map, "template.mustache"),
-                new MustacheTemplateEngine());
-
-        post("/create", (req, res) -> {
-            String body = req.body();
-            _logger.debug("Received request with body: " + body);
-            JSONObject jsonObject = new JSONObject(body);
-            int amount = Integer.parseInt(jsonObject.getString("amount"));
-            String requestorId = jsonObject.getString("requestorId");
-            String requestorName = jsonObject.getString("requestorName");
-            String approverId = jsonObject.getString("approverId");
-            String approverName = jsonObject.getString("approverName");
-//            ApprovalRequest approvalRequest = new ApprovalRequest(amount, requestorId,
-//                    requestorName, approverId, approverName);
-//            _logger.debug("approvalRequest created: " + approvalRequest);
-            //            User user = _dbManager.getUserById(approvalRequest.getRequestorId());
-            //            _logger.debug("requestor user: " + user);
-            //
-            //            insertBillAndSendMsg(approvalRequest, user);
-            return "Approval created";
-        });
+            new MustacheTemplateEngine());
 
         post("/", (req, res) -> {
             _logger.debug("Req received : " + req.body());
@@ -57,13 +43,13 @@ public class Runner {
             if ("app.install".equals(type)) {
                 String userId = jsonObject.getString("userId");
                 String userToken = jsonObject.getString("userToken");
-                Runner.userId = userId;
-                Runner.userToken = userToken;
+                User user = new User(userId, userToken);
+                _dbManager.insertOrUpdateUser(user);
                 _logger.debug("User inserted : " + userId + " User Token : " + userToken +
-                        "Make sure to change it at each install or uninstall. currently it's hardcode.");
+                              "Make sure to change it at each install or uninstall. ");
             } else if ("app.uninstall".equalsIgnoreCase(type)) {
                 String userId = jsonObject.getString("userId");
-                //                _dbManager.deleteUser(new User(userId, ""));
+                _dbManager.deleteUser(new User(userId, ""));
                 _logger.debug("User deleted : " + userId);
             } else if ("client.pressButton".equalsIgnoreCase(type)) {
 
@@ -75,9 +61,10 @@ public class Runner {
                 if (cmd.toLowerCase().equalsIgnoreCase("app")) {
                     String chatId = jsonObject.getString("chat");
                     String userId = jsonObject.getString("userId");
-                    //                    User user = _dbManager.getUserById(userId);
+                    _logger.info("User Id " + userId);
+                    User user = _dbManager.getUserById(userId);
 
-                    _messagingService.sendPlatformMessage(text, chatId);
+                    _messagingService.sendPlatformMessage(text, chatId, user);
                 }
             }
             return "";
@@ -85,9 +72,32 @@ public class Runner {
     }
 
 
-    private static String getBaseUrl() {
+    private static DbConfig getDbConfig()
+    {
+        ResourceBundle bundle = ResourceBundle.getBundle("config", Locale.getDefault());
+        return new DbConfig(bundle.getString("db_host"),
+            Integer.parseInt(bundle.getString("db_port")), bundle.getString("db_name"),
+            bundle.getString("db_username"), bundle.getString("db_password"));
+    }
+
+    private static String getBaseUrl()
+    {
         ResourceBundle bundle = ResourceBundle.getBundle("config", Locale.getDefault());
         return bundle.getString("base_url");
     }
+
+  /*  private static Map<String, List<Bill>> getLauncherMap(String queryString) throws SQLException
+    {
+        Map<String, List<Bill>> s = new HashMap<>();
+        _logger.debug("String : " + queryString);
+        JSONObject jsonObject = new JSONObject(queryString);
+        String userId = jsonObject.getString("userId");
+        _logger.debug("Userid : " + userId);
+
+        List<Bill> bills = _dbManager.getBillsForUser(userId);
+        _logger.debug("Bills fetched : " + bills);
+        s.put("bills", bills);
+        return s;
+    }*/
 
 }
