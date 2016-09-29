@@ -1,1 +1,1 @@
-var baseUrl="https://tanushee.fwd.wf/"
+var baseUrl="https://tanusheeapp.fwd.wf/"
